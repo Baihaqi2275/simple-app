@@ -1,26 +1,40 @@
 pipeline {
   agent any
+
   environment {
-    IMAGE_NAME = 'baihaqi/simple-app'
+    IMAGE_NAME = 'baihaqi/simple-app'          
     REGISTRY_CREDENTIALS = 'baihaqi2275'
   }
+
   stages {
+
     stage('Checkout') {
       steps {
+        echo 'Checkout source code...'
         checkout scm
       }
     }
+
     stage('Build') {
       steps {
-        bat 'echo "Build di Windows"'
+        bat 'echo "Mulai build aplikasi (Windows)"'
       }
     }
+
     stage('Build Docker Image') {
       steps {
-        bat """docker build -t ${env.IMAGE_NAME}:${env.BUILD_NUMBER} ."""
+        withCredentials([usernamePassword(credentialsId: env.REGISTRY_CREDENTIALS, usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+          bat """
+            echo Login Docker sebelum build...
+            docker login -u %USER% -p %PASS%
+            docker build -t ${env.IMAGE_NAME}:${env.BUILD_NUMBER} .
+            docker logout
+          """
+        }
       }
     }
-       stage('Push Docker Image') {
+
+    stage('Push Docker Image') {
       steps {
         withCredentials([usernamePassword(credentialsId: env.REGISTRY_CREDENTIALS, usernameVariable: 'USER', passwordVariable: 'PASS')]) {
           bat """
@@ -39,8 +53,6 @@ pipeline {
   post {
     always {
       echo 'Selesai build pipeline.'
-    }
-  }
+    }
+  }
 }
-
-
