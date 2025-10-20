@@ -2,7 +2,7 @@ pipeline {
   agent any
   environment {
     IMAGE_NAME = 'baihaqi/simple-app'
-    REGISTRY_CREDENTIALS = 'haqi-docker'
+    REGISTRY_CREDENTIALS = 'baihaqi2275'
   }
   stages {
     stage('Checkout') {
@@ -31,4 +31,5 @@ pipeline {
       }
     }
   }
+
 }
